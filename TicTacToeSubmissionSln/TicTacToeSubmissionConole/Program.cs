@@ -4,11 +4,16 @@ namespace TicTacToeSubmissionConole
 {
     class Program
     {
+        int tempValue;
+
+
         static void Main(string[] args)
         {
+
+
             ConsoleColor oldColor = Console.ForegroundColor;
 
-            Console.SetCursorPosition(10,2);
+            Console.SetCursorPosition(30,2);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Welcome to Tic Tac Toe");
 

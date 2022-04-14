@@ -9,58 +9,101 @@ namespace TicTacToeSubmissionConole
     public class TicTacToe
     {
         private TicTacToeConsoleRenderer _boardRenderer;
-        private int[] _boardPositions = new int[9];
+        private int[] _boardPositions = new int[] {-1,-1,-1,-1,-1,-1,-1,-1,-1};
         private int _rounds;
 
         public TicTacToe()
         {
-            _boardRenderer = new TicTacToeConsoleRenderer(10, 6);
+            _boardRenderer = new TicTacToeConsoleRenderer(40, 6);
             _boardRenderer.Render();
         }
 
-        // I really don't like this int design decision we made.  int doesn't look good.  Next class we can change to an enum
-        private void PlayMove(int player)
-            {
-
+        private void PlayMove(PlayerEnum player)
+        {
             // This method needs error handling as it accepts incorrect input from user
             // We can revist this also in the Exception Handling class and gracefully recover from errors.
-            
+
 
             // ask user for row and column
-
-            Console.SetCursorPosition(2, 19);
-
-            // change to enum
-            if (player == 1)
-                Console.Write("Player X");
-            else
-                Console.Write("Player O");
-
-            Console.SetCursorPosition(2, 20);
-
-            Console.Write("Please Enter Row: ");
-            var row = Console.ReadLine();
-
-            Console.SetCursorPosition(2, 22);
+            bool inputValid = false;
 
 
-            Console.Write("Please Enter Column: ");
-            var column = Console.ReadLine();
+            while (!inputValid)
+            {
+
+                Console.SetCursorPosition(2, 19);
+
+                // change to enum
+                if (player == PlayerEnum.X)
+                    Console.Write("Player X");
+                else
+                    Console.Write("Player O");
+
+                Console.SetCursorPosition(2, 20);
+
+                Console.Write("Please Enter Row: ");
+                var row = Console.ReadLine();
+
+                Console.SetCursorPosition(2, 22);
 
 
-            // store move in array
-            int rowNumber = int.Parse(row);
-            int columnNumber = int.Parse(column);
-            int arrayPos = (rowNumber * 3) + columnNumber;
+                Console.Write("Please Enter Column: ");
+                var column = Console.ReadLine();
+                try
+                {
 
-            _boardPositions[arrayPos] = player;
+                    // store move in array
+                    int rowNumber = int.Parse(row);
+                    int columnNumber = int.Parse(column);
+                    int arrayPos = (rowNumber * 3) + columnNumber;
+
+                    if (_boardPositions[arrayPos] == -1)
+                    {
+                        _boardPositions[arrayPos] = (int)player;
+                        _boardRenderer.AddMove(rowNumber, columnNumber, player, true);
+
+                    }
+                    else
+                    {
+                        throw new DuplicatePlayException("Player has already played this position.");
+                    }
+
+                    inputValid = true;
+                    Console.SetCursorPosition(2, 29);
+                    Console.WriteLine("                                                        ");
+
+                }
+
+                catch (FormatException exception)
+                {
+                    Console.SetCursorPosition(2, 29);
+                    Console.WriteLine("Please enter row and columns as numbers only. " + exception.Message);
+                 
+
+                    inputValid = false;
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Console.SetCursorPosition(2, 29);
+                    Console.WriteLine("Please enter numbers between 0 and 2 for row and column.");
+                    inputValid = false;
+                }
+                catch (DuplicatePlayException exception)
+                {
+                    Console.SetCursorPosition(2, 29);
+                    Console.WriteLine(exception.Message);
+
+
+                    inputValid = false;
+                }
+            }
 
             //  add move to the board
-            if (player == 1)
-                _boardRenderer.AddMove(rowNumber, columnNumber, PlayerEnum.X, true);
-            else
-                _boardRenderer.AddMove(rowNumber, columnNumber, PlayerEnum.O, true);
-
+            /*  if (player == PlayerEnum.X)
+                  _boardRenderer.AddMove(rowNumber, columnNumber, PlayerEnum.X, true);
+              else
+                  _boardRenderer.AddMove(rowNumber, columnNumber, PlayerEnum.O, true);
+            */
         }
 
         // These two methods can be deleted
@@ -131,10 +174,11 @@ namespace TicTacToeSubmissionConole
         */
 
 
-        // I really don't like this int design decision we made.  int doesn't look good.  Next class we can change to an enum
-        public bool CheckIfPlayerWins(int player)
+        public bool CheckIfPlayerWins(PlayerEnum player)
         {
-            if ((_boardPositions[0] == player) && (_boardPositions[1] == player) && (_boardPositions[2] == player))
+            int playerValue = (int)player;
+
+            if ((_boardPositions[0] == playerValue) && (_boardPositions[1] == playerValue) && (_boardPositions[2] == playerValue))
                 return true;
             
             // DO OTHER 7 Checks                
@@ -154,10 +198,10 @@ namespace TicTacToeSubmissionConole
             {
 
                 //Change to Enum
-                PlayMove(1);
+                PlayMove(PlayerEnum.X);
 
                 //Change to Enum
-                playerXWins = CheckIfPlayerWins(1);
+                playerXWins = CheckIfPlayerWins(PlayerEnum.X);
 
                 if (playerXWins)
                 {
@@ -171,9 +215,9 @@ namespace TicTacToeSubmissionConole
                 // play o
 
                 //Change to Enum
-                PlayMove(2);
+                PlayMove(PlayerEnum.O);
                 //Change to Enum
-                playerOWins = CheckIfPlayerWins(2);
+                playerOWins = CheckIfPlayerWins(PlayerEnum.O);
 
                 if (playerOWins)
                 {
